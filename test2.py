@@ -47,10 +47,11 @@ def showImage():
 
 
 def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
-    ndir, pdir = 0
+    ndir = 0
+    pdir = 0
     r = cc
     c = cc
-    d = []
+    d = [0 for i in range(8)]
     flag = False
 
     while True:
@@ -174,6 +175,7 @@ def onRegionLabeling(maxX, maxY, memImage):
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 
 def main():
     showImage()
