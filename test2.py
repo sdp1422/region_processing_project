@@ -21,14 +21,17 @@ def showImage():
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Thresholding
+    # OTSU 알고리즘 적용(이진화 처리)
     ret, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     cv2.imshow('binary image', threshold)
 
     # Opening
+    # 모폴로지 연산 적용
     kernel = np.ones((3, 3), np.uint8)
     threshold = cv2.morphologyEx(threshold, cv2.MORPH_OPEN, kernel, iterations=1)
 
     # Labeling
+    # 라벨링
     ret, markers = cv2.connectedComponents(threshold)
     cnt = np.amax(markers)
     print('number of labels = ', cnt)
