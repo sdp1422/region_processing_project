@@ -158,11 +158,12 @@ def onRegionLabeling(maxX, maxY, memImage):
                     label = label + 1
                     memImage[y][x] = label
                     peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
-            elif memImage[y][x - 1] > 0:
-                memImage[y][x] = memImage[y][x - 1]
-            elif (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] > 0):
-                memImage[y][x] = memImage[y - 1][x - 1]
-                peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y - 1][x - 1])
+                elif memImage[y][x - 1] > 0:
+                    memImage[y][x] = memImage[y][x - 1]
+                elif (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] > 0):
+                    memImage[y][x] = memImage[y - 1][x - 1]
+                    peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y - 1][x - 1])
+            print(label)
     for y in range(0, maxY):
         for x in range(0, maxX):
             c = memImage[y][x] * (255 / (label + 1))
