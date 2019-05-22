@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tkinter.filedialog import askopenfilename
 
+
 def showImage():
     filename = askopenfilename()
 
@@ -143,25 +144,33 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
         if (r == cr) and (c == cc):
             break
 
+
 def onRegionLabeling(maxX, maxY, memImage):
     pixValue = 0
     label = 0
-    for y in range(1, maxY-1):
-        for x in range(1, maxX-1):
+    for y in range(1, maxY - 1):
+        for x in range(1, maxX - 1):
             pixValue = memImage[y][x]
-            if memImage[y][x] <0:
-                if (memImage[y][x-1] <= 0) and (memImage[y-1][x-1] <= 0):
+            if memImage[y][x] < 0:
+                if (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] <= 0):
                     label = label + 1
                     memImage[y][x] = label
                     peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
-            elif memImage[y][x-1] > 0:
-                memImage[y][x] = memImage[y][x-1]
-            elif (memImage[y][x-1] <= 0) and (memImage[y-1][x-1] > 0):
-                memImage[y][x] = memImage[y-1][x-1]
-                peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y-1][x-1])
+            elif memImage[y][x - 1] > 0:
+                memImage[y][x] = memImage[y][x - 1]
+            elif (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] > 0):
+                memImage[y][x] = memImage[y - 1][x - 1]
+                peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y - 1][x - 1])
     for y in range(0, maxY):
         for x in range(0, maxX):
             c = memImage[y][x] * (255 / (label) + 1)
             if c == 0:
                 c = 255
             # 이 부분에 색 구분을 픽셀로 지정하는 코드가 들어가야 함
+
+
+def main():
+    showImage()
+
+
+main()
