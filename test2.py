@@ -21,7 +21,7 @@ def showImage():
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Thresholding
-    # OTSU 알고리즘 적용(이진화 처리)
+    # OTSU 알고리즘를 이용한 전역 이치화 처리
     ret, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     cv2.imshow('binary image', threshold)
 
