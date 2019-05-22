@@ -30,22 +30,20 @@ def showImage():
     kernel = np.ones((3, 3), np.uint8)
     threshold = cv2.morphologyEx(threshold, cv2.MORPH_OPEN, kernel, iterations=1)
 
-    # Labeling
-    # 라벨링
-    ret, markers = cv2.connectedComponents(threshold)
-    cnt = np.amax(markers)
-    print('number of labels = ', cnt)
-
-    # display markers
-    markers = markers * (254 / cnt)
-    markers = markers.astype(np.uint8)
-    cv2.imshow('labeled image', markers)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
-showImage()
+    # # Labeling
+    # # 라벨링
+    # ret, markers = cv2.connectedComponents(threshold)
+    # cnt = np.amax(markers)
+    # print('number of labels = ', cnt)
+    #
+    # # display markers
+    # markers = markers * (254 / cnt)
+    # markers = markers.astype(np.uint8)
+    # cv2.imshow('labeled image', markers)
+    #
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    onRegionLabeling(maxX=maxX, maxY=maxY, memImage=threshold)
 
 
 def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
@@ -171,6 +169,8 @@ def onRegionLabeling(maxX, maxY, memImage):
                 c = 255
             # 이 부분에 색 구분을 픽셀로 지정하는 코드가 들어가야 함
 
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 def main():
     showImage()
