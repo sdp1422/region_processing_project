@@ -5,7 +5,15 @@ from tkinter.filedialog import askopenfilename
 
 def showImage():
     filename = askopenfilename()
-    img = cv2.imread(filename, cv2.IMREAD_COLOR)
+
+    stream = open(filename.encode("utf-8"), "rb")
+
+    bytes = bytearray(stream.read())
+
+    numpyarray = np.asarray(bytes, dtype=np.uint8)
+
+    img = cv2.imdecode(numpyarray, cv2.IMREAD_COLOR)
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Thresholding
     ret, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
