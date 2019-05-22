@@ -166,7 +166,7 @@ def onRegionLabeling(maxX, maxY, memImage):
                 peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y - 1][x - 1])
     for y in range(0, maxY):
         for x in range(0, maxX):
-            c = memImage[y][x] * (255 / (label) + 1)
+            c = memImage[y][x] * (255 / (label + 1))
             if c == 0:
                 c = 255
             # 이 부분에 색 구분을 픽셀로 지정하는 코드가 들어가야 함
