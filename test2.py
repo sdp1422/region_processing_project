@@ -168,6 +168,7 @@ def onRegionLabeling(maxX, maxY, memImage):
             if c == 0:
                 c = 255
             # 이 부분에 색 구분을 픽셀로 지정하는 코드가 들어가야 함
+            memImage.itemset((y, x), c)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
