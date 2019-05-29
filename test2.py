@@ -55,14 +55,15 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
     flag = False
 
     while True:
-        d[0] = memImage[r][c + 1]
-        d[1] = memImage[r + 1][c + 1]
-        d[2] = memImage[r + 1][c]
-        d[3] = memImage[r + 1][c - 1]
-        d[4] = memImage[r][c - 1]
-        d[5] = memImage[r - 1][c - 1]
-        d[6] = memImage[r - 1][c]
-        d[7] = memImage[r - 1][c + 1]
+        d[0] = memImage.item(r, c + 1)
+        d[1] = memImage.item(r + 1, c + 1)
+        d[2] = memImage.item(r + 1, c)
+        d[3] = memImage.item(r + 1, c - 1)
+        d[4] = memImage.item(r, c - 1)
+        d[5] = memImage.item(r - 1, c - 1)
+        d[6] = memImage.item(r - 1, c)
+        d[7] = memImage.item(r - 1, c + 1)
+
 
         if (not d[0]) and (not d[1]) and (not d[2]) and (not d[3]) and (not d[4]) and (not d[5]) and (not d[6]) and (
                 not d[7]):
@@ -74,75 +75,66 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
             ndir = 6
         elif ndir == -3:
             ndir = 5
+
         while True:
             if (d[ndir] == pixel) or (d[ndir] == label):
                 flag = False
+
+                # start - switch(pdir) statement for python
                 if pdir == 1:
                     if ndir == 5:
-                        flag = True
-                        break
+                        flag = True; break
                 elif pdir == 2:
                     if ndir == 5 or ndir == 6:
-                        flag = True
-                        break
+                        flag = True; break
                 elif pdir == 3:
                     if ndir == 5 or ndir == 6 or ndir == 7:
-                        flag = True
-                        break
+                        flag = True; break
                 elif pdir == 4:
                     if ndir == 0 or ndir == 5 or ndir == 6 or ndir == 7:
-                        flag = True
-                        break
+                        flag = True; break
                 elif pdir == 5:
                     if ndir != 2 and ndir != 3 and ndir != 4:
-                        flag = True
-                        break
+                        flag = True; break
                 elif pdir == 6:
                     if ndir != 3 and ndir != 4:
-                        flag = True
-                        break
+                        flag = True; break
                 elif pdir == 7:
-                    if ndir == 4:
-                        flag = True
-                        break
+                    if ndir != 4:
+                        flag = True; break
+                # end - switch(pdir) statement for python
 
                 if flag:
-                    memImage[r][c] = label
-                    pdir = ndir
+                    memImage.itemset((r, c), label)
+                pdir = ndir
                 break
+            # end - if statement
             else:
-                ndir = ndir + 1
+                ndir += 1
                 if ndir > 7:
                     ndir = 0
+            # end - (it - else) statement
+        # end - while loop
 
+        # start - switch(ndir) statement for python
         if ndir == 0:
-            c = c + 1
-            break
+            c += 1; break
         elif ndir == 1:
-            r = r + 1
-            c = c + 1
-            break
+            r += 1; c += 1; break
         elif ndir == 2:
-            r = r + 1
-            break
+            r += 1; break
         elif ndir == 3:
-            r = r + 1
-            c = c - 1
-            break
+            r += 1; c -= 1; break
         elif ndir == 4:
-            c = c - 1
-            break
+            c -= 1; break
         elif ndir == 5:
-            r = r - 1
-            c = c - 1
-            break
+            r -= 1; c -= 1; break
         elif ndir == 6:
-            r = r - 1
-            break
+            r -= 1; break
         elif ndir == 7:
-            r = r - 1
-            c = c + 1
-            break
+            r -= 1; c += 1; break
+        # end - switch(ndir) statement for python
+
         if (r == cr) and (c == cc):
             break
 
@@ -150,28 +142,33 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
 def onRegionLabeling(maxX, maxY, memImage):
     pixValue = 0
     label = 0
+
     for y in range(1, maxY - 1):
         for x in range(1, maxX - 1):
-            pixValue = memImage[y][x]
-            if memImage[y][x] < 0:
-                if (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] <= 0):
-                    label = label + 1
-                    memImage[y][x] = label
+            pixValue = memImage.item(y, x)
+
+            if memImage.item(y, x) < 0:
+                if (memImage.item(y, x-1) <= 0) and (memImage.item(y-1, x-1) <= 0):
+                    label += 1
+                    memImage.itemset((y, x), label)
                     peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
-                elif memImage[y][x - 1] > 0:
-                    memImage[y][x] = memImage[y][x - 1]
-                elif (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] > 0):
-                    memImage[y][x] = memImage[y - 1][x - 1]
-                    peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y - 1][x - 1])
-            print(label)
+                elif memImage.item(y, x-1) > 0:
+                    memImage.itemset((y, x), memImage.item(y, x-1))
+                elif (memImage.item(y, x-1) <= 0) and (memImage.item(y-1, x-1) > 0):
+                    memImage.itemset((y, x), memImage.item(y-1, x-1))
+                    peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage.item(y - 1, x - 1))
+        # end - for x range
+    # end - for y range
+
     for y in range(0, maxY):
         for x in range(0, maxX):
-            c = memImage[y][x] * (255 / (label + 1))
+            c = memImage.item(y, x) * (255 / (label + 1))
             if c == 0:
                 c = 255
             # 이 부분에 색 구분을 픽셀로 지정하는 코드가 들어가야 함
             memImage.itemset((y, x), c)
-
+        # end - for x range
+    # end - for y range
     cv2.imshow('labeled image', memImage)
 
     cv2.waitKey(0)
