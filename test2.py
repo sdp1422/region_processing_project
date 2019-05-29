@@ -7,12 +7,10 @@ from tkinter.filedialog import askopenfilename
 def showImage():
     filename = askopenfilename()
 
+    # 한글 경로의 이미지 파일 읽어오기 위한 코드 수정
     stream = open(filename.encode("utf-8"), "rb")
-
     bytes = bytearray(stream.read())
-
     numpyarray = np.asarray(bytes, dtype=np.uint8)
-
     img = cv2.imdecode(numpyarray, cv2.IMREAD_COLOR)
 
     cv2.imshow('original image', img)
@@ -150,14 +148,14 @@ def onRegionLabeling(maxX, maxY, memImage):
             pixValue = memImage.item(y, x)
 
             if memImage.item(y, x) < 0:
-                if (memImage.item(y, x-1) <= 0) and (memImage.item(y-1, x-1) <= 0):
+                if (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) <= 0):
                     label += 1
                     memImage.itemset((y, x), label)
                     peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
-                elif memImage.item(y, x-1) > 0:
+                elif memImage.item(y, x - 1) > 0:
                     memImage.itemset((y, x), memImage.item(y, x-1))
-                elif (memImage.item(y, x-1) <= 0) and (memImage.item(y-1, x-1) > 0):
-                    memImage.itemset((y, x), memImage.item(y-1, x-1))
+                elif (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) > 0):
+                    memImage.itemset((y, x), memImage.item(y - 1, x - 1))
                     peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage.item(y - 1, x - 1))
         # end - for x range
     # end - for y range
