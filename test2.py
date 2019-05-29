@@ -15,6 +15,8 @@ def showImage():
 
     img = cv2.imdecode(numpyarray, cv2.IMREAD_COLOR)
 
+    cv2.imshow('original image', img)
+
     maxY = img.shape[0]
     maxX = img.shape[1]
 
