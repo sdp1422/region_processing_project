@@ -22,6 +22,7 @@ def showImage():
 
     # Thresholding
     # OTSU 알고리즘를 이용한 전역 이치화 처리
+    # ret, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     ret, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     cv2.imshow('binary image', threshold)
 
@@ -143,6 +144,22 @@ def onRegionLabeling(maxX, maxY, memImage):
     pixValue = 0
     label = 0
 
+    for y in range(0, maxY):
+        for x in range(0, maxX):
+            c = 0
+            if x == 0 or y == 0 or x == (maxX - 1) or y == (maxY - 1):
+                c = 0
+            else:
+                c = memImage.item(y, x)
+                print(c)
+                if c == 0:
+                    c = 0
+                else:
+                    c = -c
+                memImage.itemset((y, x), c)
+        # end - for x range
+    # end - for y range
+
     for y in range(1, maxY - 1):
         for x in range(1, maxX - 1):
             pixValue = memImage.item(y, x)
@@ -152,13 +169,19 @@ def onRegionLabeling(maxX, maxY, memImage):
                     label += 1
                     memImage.itemset((y, x), label)
                     peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
+                    print('1')
                 elif memImage.item(y, x - 1) > 0:
                     memImage.itemset((y, x), memImage.item(y, x-1))
+                    print('2')
                 elif (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) > 0):
                     memImage.itemset((y, x), memImage.item(y - 1, x - 1))
+                    print('흐으으으으음')
                     peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage.item(y - 1, x - 1))
+                    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         # end - for x range
     # end - for y range
+
+    print('label = ' + str(label))
 
     for y in range(0, maxY):
         for x in range(0, maxX):
