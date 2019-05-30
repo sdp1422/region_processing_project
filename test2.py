@@ -3,27 +3,41 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tkinter.filedialog import askopenfilename
 
+'''
+논문 제목 : Fast Region Labeling with Boundary Tracking
+논문 저자 : Hironobu Takahashi / Fumiaki Tomita
+
+작 성 자  : 한국교통대학교 소프트웨어학과 1444009 박상돈
+구현 일자 : 2019/05/30
+구현 목적 : 영상정보처리 2번째 레포트
+'''
+
 
 def showImage():
     filename = askopenfilename()
 
-    # 한글 경로의 이미지 파일 읽어오기 위한 코드 수정
+    # 한글 경로의 이미지 파일 읽어오기 위한 코드로 수정
     stream = open(filename.encode("utf-8"), "rb")
     bytes = bytearray(stream.read())
     numpyarray = np.asarray(bytes, dtype=np.uint8)
     img = cv2.imdecode(numpyarray, cv2.IMREAD_COLOR)
 
+    # 원본 이미지 띄우기
     cv2.imshow('original image', img)
 
+    # 이미지 높이, 너비
     maxY = img.shape[0]
     maxX = img.shape[1]
 
+    # 이미지 컬러 -> 흑백
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Thresholding
-    # OTSU 알고리즘를 이용한 전역 이치화 처리
-    # ret, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # OTSU의 이진화
+    # OTSU 알고리즘과 이진화를 통한 전역 이치화 처리
     ret, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # 이진화된 이미지 출력
     cv2.imshow('binary image', threshold)
 
     # Opening
@@ -47,33 +61,17 @@ def showImage():
     onRegionLabeling(maxX=maxX, maxY=maxY, source=threshold)
 
 
+# 영역 레이블링시 경계 탐색(8방향)
 def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
-    ndir = 0
-    pdir = 0
-    r = cr
-    c = cc
+    pdir = 0        # 이전 탐색 방향
+    ndir = 0        # 다음 탐색 방향
+    r = cr          # row 좌표
+    c = cc          # column 좌표
     d = [0 for i in range(8)]
     flag = False
 
     while True:
-        # d[0] = memImage.item(r, c + 1)
-        # d[1] = memImage.item(r + 1, c + 1)
-        # d[2] = memImage.item(r + 1, c)
-        # d[3] = memImage.item(r + 1, c - 1)
-        # d[4] = memImage.item(r, c - 1)
-        # d[5] = memImage.item(r - 1, c - 1)
-        # d[6] = memImage.item(r - 1, c)
-        # d[7] = memImage.item(r - 1, c + 1)
-
-        # d[0] = memImage[c + 1][r]
-        # d[1] = memImage[c + 1][r + 1]
-        # d[2] = memImage[c][r + 1]
-        # d[3] = memImage[c - 1][r + 1]
-        # d[4] = memImage[c - 1][r]
-        # d[5] = memImage[c - 1][r - 1]
-        # d[6] = memImage[c][r - 1]
-        # d[7] = memImage[c + 1][r - 1]
-
+        print('흐으으으으으으음')
         d[0] = memImage[r][c + 1]
         d[1] = memImage[r + 1][c + 1]
         d[2] = memImage[r + 1][c]
@@ -86,6 +84,8 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
         if (not d[0]) and (not d[1]) and (not d[2]) and (not d[3]) and (not d[4]) and (not d[5]) and (not d[6]) and (
                 not d[7]):
             break
+
+        # 마스크 내의 탐색시작 방향 설정
         ndir = pdir - 3
         if ndir == -1:
             ndir = 7
@@ -94,12 +94,17 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
         elif ndir == -3:
             ndir = 5
 
+        # 마스크 내의 탐색을 시계방향으로 수행
         while True:
+
             if (d[ndir] == pixel) or (d[ndir] == label):
                 flag = False
 
-                # start - switch(pdir) statement for python
-                if pdir == 1:
+                # start - switch (pdir) statement for python
+                if pdir == 0:
+                    if ndir != 5 and ndir != 6:
+                        flag = True; break
+                elif pdir == 1:
                     if ndir == 5:
                         flag = True; break
                 elif pdir == 2:
@@ -123,19 +128,21 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
                 # end - switch(pdir) statement for python
 
                 if flag:
-                    # memImage.itemset((r, c), label)
                     memImage[r][c] = label
                 pdir = ndir
                 break
             # end - if statement
+            # 다음 탐색 방향 설정
             else:
                 ndir += 1
                 if ndir > 7:
                     ndir = 0
+                    break
             # end - (it - else) statement
         # end - while loop
 
-        # start - switch(ndir) statement for python
+        # 위치 이동
+        # start - switch (ndir) statement for python
         if ndir == 0:
             c += 1; break
         elif ndir == 1:
@@ -152,21 +159,22 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
             r -= 1; break
         elif ndir == 7:
             r -= 1; c += 1; break
-        # end - switch(ndir) statement for python
+        # end - switch (ndir) statement for python
 
         if (r == cr) and (c == cc):
             break
 
 
+# 이진 영상에 대해 레이블링 수행
 def onRegionLabeling(maxX, maxY, source):
     pixValue = 0
     label = 0
 
+    # 원본 이미지와 같은 크기의 2차원 리스트 생성
     memImage = [[0 for x in range(0, maxX)] for y in range(0, maxY)]
-    # memImage = source
-    # memImage = np.arange(maxX * maxY).reshape((maxX, maxY))
 
-    # memImage = np.zeros_like(source)
+    # 원본 이미지를 memImage에 복사(음수로 만듬, 가장자리는 0으로 변환)
+    # 논문에 써있듯이 이미지의 픽셀 값을 0 또는 음수('R')로 초기화
     for y in range(maxY):
         for x in range(maxX):
             c = 0
@@ -175,99 +183,45 @@ def onRegionLabeling(maxX, maxY, source):
             else:
                 c = source.item((y, x))
                 c = -c
-            # print(c)
-            # memImage.itemset((y, x), c)
             memImage[y][x] = c
-    # for y in range(0, maxY):
-    #     for x in range(0, 1):
-    #         c = 0
-    #         if x == 0 or y == 0 or x == (maxX - 1) or y == (maxY - 1):
-    #             c = 0
-    #         else:
-    #             # c = source.item(x, y)
-    #             c = source.item(y, x)
-    #
-    #             if c == 0:
-    #                 c = 0
-    #             else:
-    #                 c = -c
-    #                 # print(c)
-    #         # print(c)
-    #         memImage.itemset((y, x), c)
-    #         # memImage[y][x] = c
-    #         print(c)
-    #     # end - for x range
-    # # end - for y range
 
-    # for y in range(0, maxY):
-    #     for x in range(0, maxX):
-    #         print(memImage.item(y, x))
-    #         # print('hahahahahahahahahahahahahahaha')
-
+    # 영역 레이블링 수행
     for y in range(1, maxY - 1):
         for x in range(1, maxX - 1):
-            # print(memImage.item(y, x))
-            print(memImage[y][x])
-
-    # for y in range(1, maxY - 1):
-    #     for x in range(1, maxX - 1):
-    #         # pixValue = memImage.item(y, x)
-    #         pixValue = memImage[x][y]
-    #
-    #         if memImage.item(y, x) < 0:
-    #             if (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) <= 0):
-    #                 label += 1
-    #                 memImage.itemset((y, x), label)
-    #                 peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
-    #                 print('1')
-    #             elif memImage.item(y, x - 1) > 0:
-    #                 memImage.itemset((y, x), memImage.item(y, x-1))
-    #                 print('2')
-    #             elif (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) > 0):
-    #                 memImage.itemset((y, x), memImage.item(y - 1, x - 1))
-    #                 print('흐으으으으음')
-    #                 peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage.item(y - 1, x - 1))
-    #                 print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-    #     # end - for x range
-    # # end - for y range
-
-    for y in range(1, maxY - 1):
-        for x in range(1, maxX - 1):
-            # pixValue = memImage.item(y, x)
             pixValue = memImage[y][x]
 
             if memImage[y][x] < 0:
                 if (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] <= 0):
+                    print('1')
                     label += 1
                     memImage[y][x] = label
                     peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
-                    print('1')
                 elif memImage[y][x - 1] > 0:
-                    memImage[y][x] = memImage[y][x - 1]
                     print('2')
+                    memImage[y][x] = memImage[y][x - 1]
                 elif (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] > 0):
+                    print('3')
                     memImage[y - 1][x] = memImage[y - 1][x - 1]
-
-                    print('흐으으으으음')
                     peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y - 1][x - 1])
-                    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+                    print('ㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗ')
+        print('x = ' + str(x))
+        print('y - ' + str(y))
         # end - for x range
     # end - for y range
 
+    # 라벨링 개수 출력 및 확인
     print('label = ' + str(label))
 
+    # 레이블링된 각 영역을 적절한 색상으로 표현
     for y in range(0, maxY):
         for x in range(0, maxX):
-            # c = memImage.item(y, x) * (255 / (label + 1))
+            # 레이블의 수에 따라 밝기 값을 균등 분할
             c = memImage[y][x] * (255 / (label + 1))
             if c == 0:
                 c = 255
-            # 이 부분에 색 구분을 픽셀로 지정하는 코드가 들어가야 함
-            # memImage.itemset((y, x), c)
-            # memImage[y][x] = c
+
+            # 각 픽셀에 BGR 값을 대입
             memImage[y][x] = [c, c, c]
-
-
         # end - for x range
     # end - for y range
 
@@ -279,25 +233,24 @@ def onRegionLabeling(maxX, maxY, source):
     # a = np.ndarray(memImage, dtype=np.float32)
     # np.uint8
     # a = np.asarray(memImage, dtype=np.int64)
+
+    # memImage를 ndarray 타입으로 변경
     a = np.asarray(memImage, dtype=np.uint8)
-    # a = np.reshape(maxX, maxY)
 
-    print(type(a))
-
-    print(a[0][2])
 
     plt.imshow(a, interpolation='nearest')
     plt.show()
 
     # c = cv2.imread(a, cv2.IMREAD_GRAYSCALE)
     # c = cv2.cvtColor(a, cv2.COLOR_GRAY2BGR)
-    cv2.imshow('hawawa', a)
+    # cv2.imshow('hawawa', a)
 
-    b = cv2.cvtColor(a, cv2.COLOR_BGR2GRAY)
+    # b = cv2.cvtColor(a, cv2.COLOR_BGR2GRAY)
     # cv2.imshow('labeled image', memImage)
 
-    print(type(b))
-    cv2.imshow('labeled image', b)
+    # print(type(b))
+    # cv2.imshow('labeled image', b)
+    cv2.imshow('labeled image', a)
 
 
     cv2.waitKey(0)
