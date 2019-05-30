@@ -192,20 +192,14 @@ def onRegionLabeling(maxX, maxY, source):
 
             if memImage[y][x] < 0:
                 if (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] <= 0):
-                    print('1')
                     label += 1
                     memImage[y][x] = label
                     peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
                 elif memImage[y][x - 1] > 0:
-                    print('2')
                     memImage[y][x] = memImage[y][x - 1]
                 elif (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] > 0):
-                    print('3')
                     memImage[y - 1][x] = memImage[y - 1][x - 1]
                     peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y - 1][x - 1])
-                    print('ㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗㅗ')
-        print('x = ' + str(x))
-        print('y - ' + str(y))
         # end - for x range
     # end - for y range
 
@@ -225,33 +219,15 @@ def onRegionLabeling(maxX, maxY, source):
         # end - for x range
     # end - for y range
 
-    # a = map(memImage)
-
-    # a = np.array(memImage)
-    print(type(memImage))
-    print(type(source))
-    # a = np.ndarray(memImage, dtype=np.float32)
-    # np.uint8
-    # a = np.asarray(memImage, dtype=np.int64)
-
     # memImage를 ndarray 타입으로 변경
-    a = np.asarray(memImage, dtype=np.uint8)
+    memImage_ndarray = np.asarray(memImage, dtype=np.uint8)
 
-
-    plt.imshow(a, interpolation='nearest')
+    # matplot 라이브러리를 이용한 결과 화면 출력
+    plt.imshow(memImage_ndarray, interpolation='nearest')
     plt.show()
 
-    # c = cv2.imread(a, cv2.IMREAD_GRAYSCALE)
-    # c = cv2.cvtColor(a, cv2.COLOR_GRAY2BGR)
-    # cv2.imshow('hawawa', a)
-
-    # b = cv2.cvtColor(a, cv2.COLOR_BGR2GRAY)
-    # cv2.imshow('labeled image', memImage)
-
-    # print(type(b))
-    # cv2.imshow('labeled image', b)
-    cv2.imshow('labeled image', a)
-
+    # 'labeled image' 윈도우 창으로 결과 화면 출력
+    cv2.imshow('labeled image', memImage_ndarray)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
