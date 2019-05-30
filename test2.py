@@ -13,6 +13,7 @@ from tkinter.filedialog import askopenfilename
 
 > 작성자
 - 한국교통대학교 소프트웨어학과 1444009 박상돈
+- github : https://github.com/sdp1422/region_processing_project/tree/test2_develop
 
 > 최종 구현 일자
 - 2019/05/30
@@ -22,7 +23,7 @@ from tkinter.filedialog import askopenfilename
 - 논문을 읽고 이해한 후, Region Labeling 알고리즘을 구현하고, 간단한 영상을 이치화 시킨 후, 레이블링 된 결과를 캡쳐해서 보고서를 작성한 후 제출하시오.
 
 > 참고 사항
-논문 해석 오역에 따른 잘못된 코드 구현이 있을 수 있습니다.
+- 논문 해석 오역에 따른 잘못된 코드 구현이 있을 수 있습니다.
 
 '''
 
