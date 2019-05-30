@@ -4,12 +4,26 @@ import matplotlib.pyplot as plt
 from tkinter.filedialog import askopenfilename
 
 '''
-논문 제목 : Fast Region Labeling with Boundary Tracking
-논문 저자 : Hironobu Takahashi / Fumiaki Tomita
 
-작 성 자  : 한국교통대학교 소프트웨어학과 1444009 박상돈
-구현 일자 : 2019/05/30
-구현 목적 : 영상정보처리 2번째 레포트
+> 논문 제목
+- Fast Region Labeling with Boundary Tracking
+
+> 논문 저자
+- Hironobu Takahashi / Fumiaki Tomita
+
+> 작성자
+- 한국교통대학교 소프트웨어학과 1444009 박상돈
+
+> 최종 구현 일자
+- 2019/05/30
+
+> 구현 목적
+- 영상정보처리 2번째 레포트 과제
+- 논문을 읽고 이해한 후, Region Labeling 알고리즘을 구현하고, 간단한 영상을 이치화 시킨 후, 레이블링 된 결과를 캡쳐해서 보고서를 작성한 후 제출하시오.
+
+> 참고 사항
+논문 해석 오역에 따른 잘못된 코드 구현이 있을 수 있습니다.
+
 '''
 
 
@@ -29,13 +43,19 @@ def showImage():
     maxY = img.shape[0]
     maxX = img.shape[1]
 
-    # 이미지 컬러 -> 흑백
+    # 이미지 변환 : 컬러 -> 흑백
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Thresholding
+    # 원래 코드
     # OTSU의 이진화
     # OTSU 알고리즘과 이진화를 통한 전역 이치화 처리
-    ret, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # threshold() 함수 사용
+    # 극단적으로 이분화 됨
+
+    # 수정 코드 : 적응 이치화로 수정
+    # adaptiveThreshold() 함수 사용
+    threshold = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 5, 2)
 
     # 이진화된 이미지 출력
     cv2.imshow('binary image', threshold)
@@ -45,19 +65,6 @@ def showImage():
     kernel = np.ones((3, 3), np.uint8)
     threshold = cv2.morphologyEx(threshold, cv2.MORPH_OPEN, kernel, iterations=1)
 
-    # # Labeling
-    # # 라벨링
-    # ret, markers = cv2.connectedComponents(threshold)
-    # cnt = np.amax(markers)
-    # print('number of labels = ', cnt)
-    #
-    # # display markers
-    # markers = markers * (254 / cnt)
-    # markers = markers.astype(np.uint8)
-    # cv2.imshow('labeled image', markers)
-    #
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
     onRegionLabeling(maxX=maxX, maxY=maxY, source=threshold)
 
 
@@ -71,7 +78,6 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
     flag = False
 
     while True:
-        print('흐으으으으으으음')
         d[0] = memImage[r][c + 1]
         d[1] = memImage[r + 1][c + 1]
         d[2] = memImage[r + 1][c]
@@ -101,6 +107,7 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
                 flag = False
 
                 # start - switch (pdir) statement for python
+                # pdir == 0 상황인 경우의 코드 추가
                 if pdir == 0:
                     if ndir != 5 and ndir != 6:
                         flag = True; break
@@ -137,6 +144,7 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
                 ndir += 1
                 if ndir > 7:
                     ndir = 0
+                    # 이미지에 따라 무한 반복되는 상황(while True)이 연출되어 break 구문 추가
                     break
             # end - (it - else) statement
         # end - while loop
