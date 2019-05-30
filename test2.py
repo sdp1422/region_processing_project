@@ -44,27 +44,44 @@ def showImage():
     #
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
-    onRegionLabeling(maxX=maxX, maxY=maxY, memImage=threshold)
+    onRegionLabeling(maxX=maxX, maxY=maxY, source=threshold)
 
 
 def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
     ndir = 0
     pdir = 0
-    r = cc
+    r = cr
     c = cc
     d = [0 for i in range(8)]
     flag = False
 
     while True:
-        d[0] = memImage.item(r, c + 1)
-        d[1] = memImage.item(r + 1, c + 1)
-        d[2] = memImage.item(r + 1, c)
-        d[3] = memImage.item(r + 1, c - 1)
-        d[4] = memImage.item(r, c - 1)
-        d[5] = memImage.item(r - 1, c - 1)
-        d[6] = memImage.item(r - 1, c)
-        d[7] = memImage.item(r - 1, c + 1)
+        # d[0] = memImage.item(r, c + 1)
+        # d[1] = memImage.item(r + 1, c + 1)
+        # d[2] = memImage.item(r + 1, c)
+        # d[3] = memImage.item(r + 1, c - 1)
+        # d[4] = memImage.item(r, c - 1)
+        # d[5] = memImage.item(r - 1, c - 1)
+        # d[6] = memImage.item(r - 1, c)
+        # d[7] = memImage.item(r - 1, c + 1)
 
+        # d[0] = memImage[c + 1][r]
+        # d[1] = memImage[c + 1][r + 1]
+        # d[2] = memImage[c][r + 1]
+        # d[3] = memImage[c - 1][r + 1]
+        # d[4] = memImage[c - 1][r]
+        # d[5] = memImage[c - 1][r - 1]
+        # d[6] = memImage[c][r - 1]
+        # d[7] = memImage[c + 1][r - 1]
+
+        d[0] = memImage[r][c + 1]
+        d[1] = memImage[r + 1][c + 1]
+        d[2] = memImage[r + 1][c]
+        d[3] = memImage[r + 1][c - 1]
+        d[4] = memImage[r][c - 1]
+        d[5] = memImage[r - 1][c - 1]
+        d[6] = memImage[r - 1][c]
+        d[7] = memImage[r - 1][c + 1]
 
         if (not d[0]) and (not d[1]) and (not d[2]) and (not d[3]) and (not d[4]) and (not d[5]) and (not d[6]) and (
                 not d[7]):
@@ -106,7 +123,8 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
                 # end - switch(pdir) statement for python
 
                 if flag:
-                    memImage.itemset((r, c), label)
+                    # memImage.itemset((r, c), label)
+                    memImage[r][c] = label
                 pdir = ndir
                 break
             # end - if statement
@@ -140,43 +158,98 @@ def peripheralHoleBoundaryTracking(mode, memImage, cr, cc, pixel, label):
             break
 
 
-def onRegionLabeling(maxX, maxY, memImage):
+def onRegionLabeling(maxX, maxY, source):
     pixValue = 0
     label = 0
 
-    for y in range(0, maxY):
-        for x in range(0, maxX):
+    memImage = [[0 for x in range(0, maxX)] for y in range(0, maxY)]
+    # memImage = source
+    # memImage = np.arange(maxX * maxY).reshape((maxX, maxY))
+
+    # memImage = np.zeros_like(source)
+    for y in range(maxY):
+        for x in range(maxX):
             c = 0
             if x == 0 or y == 0 or x == (maxX - 1) or y == (maxY - 1):
                 c = 0
             else:
-                c = memImage.item(y, x)
-                print(c)
-                if c == 0:
-                    c = 0
-                else:
-                    c = -c
-                memImage.itemset((y, x), c)
-        # end - for x range
-    # end - for y range
+                c = source.item((y, x))
+                c = -c
+            # print(c)
+            # memImage.itemset((y, x), c)
+            memImage[y][x] = c
+    # for y in range(0, maxY):
+    #     for x in range(0, 1):
+    #         c = 0
+    #         if x == 0 or y == 0 or x == (maxX - 1) or y == (maxY - 1):
+    #             c = 0
+    #         else:
+    #             # c = source.item(x, y)
+    #             c = source.item(y, x)
+    #
+    #             if c == 0:
+    #                 c = 0
+    #             else:
+    #                 c = -c
+    #                 # print(c)
+    #         # print(c)
+    #         memImage.itemset((y, x), c)
+    #         # memImage[y][x] = c
+    #         print(c)
+    #     # end - for x range
+    # # end - for y range
+
+    # for y in range(0, maxY):
+    #     for x in range(0, maxX):
+    #         print(memImage.item(y, x))
+    #         # print('hahahahahahahahahahahahahahaha')
 
     for y in range(1, maxY - 1):
         for x in range(1, maxX - 1):
-            pixValue = memImage.item(y, x)
+            # print(memImage.item(y, x))
+            print(memImage[y][x])
 
-            if memImage.item(y, x) < 0:
-                if (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) <= 0):
+    # for y in range(1, maxY - 1):
+    #     for x in range(1, maxX - 1):
+    #         # pixValue = memImage.item(y, x)
+    #         pixValue = memImage[x][y]
+    #
+    #         if memImage.item(y, x) < 0:
+    #             if (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) <= 0):
+    #                 label += 1
+    #                 memImage.itemset((y, x), label)
+    #                 peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
+    #                 print('1')
+    #             elif memImage.item(y, x - 1) > 0:
+    #                 memImage.itemset((y, x), memImage.item(y, x-1))
+    #                 print('2')
+    #             elif (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) > 0):
+    #                 memImage.itemset((y, x), memImage.item(y - 1, x - 1))
+    #                 print('흐으으으으음')
+    #                 peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage.item(y - 1, x - 1))
+    #                 print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    #     # end - for x range
+    # # end - for y range
+
+    for y in range(1, maxY - 1):
+        for x in range(1, maxX - 1):
+            # pixValue = memImage.item(y, x)
+            pixValue = memImage[y][x]
+
+            if memImage[y][x] < 0:
+                if (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] <= 0):
                     label += 1
-                    memImage.itemset((y, x), label)
+                    memImage[y][x] = label
                     peripheralHoleBoundaryTracking(1, memImage, y, x, pixValue, label)
                     print('1')
-                elif memImage.item(y, x - 1) > 0:
-                    memImage.itemset((y, x), memImage.item(y, x-1))
+                elif memImage[y][x - 1] > 0:
+                    memImage[y][x] = memImage[y][x - 1]
                     print('2')
-                elif (memImage.item(y, x - 1) <= 0) and (memImage.item(y - 1, x - 1) > 0):
-                    memImage.itemset((y, x), memImage.item(y - 1, x - 1))
+                elif (memImage[y][x - 1] <= 0) and (memImage[y - 1][x - 1] > 0):
+                    memImage[y - 1][x] = memImage[y - 1][x - 1]
+
                     print('흐으으으으음')
-                    peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage.item(y - 1, x - 1))
+                    peripheralHoleBoundaryTracking(2, memImage, y, x, pixValue, memImage[y - 1][x - 1])
                     print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         # end - for x range
     # end - for y range
@@ -185,14 +258,47 @@ def onRegionLabeling(maxX, maxY, memImage):
 
     for y in range(0, maxY):
         for x in range(0, maxX):
-            c = memImage.item(y, x) * (255 / (label + 1))
+            # c = memImage.item(y, x) * (255 / (label + 1))
+            c = memImage[y][x] * (255 / (label + 1))
             if c == 0:
                 c = 255
             # 이 부분에 색 구분을 픽셀로 지정하는 코드가 들어가야 함
-            memImage.itemset((y, x), c)
+            # memImage.itemset((y, x), c)
+            # memImage[y][x] = c
+            memImage[y][x] = [c, c, c]
+
+
         # end - for x range
     # end - for y range
-    cv2.imshow('labeled image', memImage)
+
+    # a = map(memImage)
+
+    # a = np.array(memImage)
+    print(type(memImage))
+    print(type(source))
+    # a = np.ndarray(memImage, dtype=np.float32)
+    # np.uint8
+    # a = np.asarray(memImage, dtype=np.int64)
+    a = np.asarray(memImage, dtype=np.uint8)
+    # a = np.reshape(maxX, maxY)
+
+    print(type(a))
+
+    print(a[0][2])
+
+    plt.imshow(a, interpolation='nearest')
+    plt.show()
+
+    # c = cv2.imread(a, cv2.IMREAD_GRAYSCALE)
+    # c = cv2.cvtColor(a, cv2.COLOR_GRAY2BGR)
+    cv2.imshow('hawawa', a)
+
+    b = cv2.cvtColor(a, cv2.COLOR_BGR2GRAY)
+    # cv2.imshow('labeled image', memImage)
+
+    print(type(b))
+    cv2.imshow('labeled image', b)
+
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
