@@ -13,7 +13,7 @@ from tkinter.filedialog import askopenfilename
 
 > 작성자
 - 한국교통대학교 소프트웨어학과 1444009 박상돈
-- github : https://github.com/sdp1422/region_processing_project/tree/test2_develop
+- github : https://github.com/sdp1422/region_processing_project
 
 > 최종 구현 일자
 - 2019/05/30
